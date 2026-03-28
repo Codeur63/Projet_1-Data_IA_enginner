@@ -1,0 +1,30 @@
+[project]
+name = "projet-1-data-ia-enginner"
+version = "0.1.0"
+description = "Nexacommerce netooyer les donnees"
+authors = [
+    {name = "Codeur63",email = "Codeur63@gmail.com"}
+]
+license = {text = "Author"}
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pandas (>=3.0.1,<4.0.0)",
+    "numpy (>=2.4.3,<3.0.0)",
+    "matplotlib (>=3.10.8,<4.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "black (>=26.3.1,<27.0.0)",
+    "flake8 (>=7.3.0,<8.0.0)",
+    "pre-commit (>=4.5.1,<5.0.0)",
+    "pytest (>=9.0.2,<10.0.0)",
+    "jupyterlab (>=4.5.6,<5.0.0)",
+    "pytest-cov (>=7.1.0,<8.0.0)"
+]
