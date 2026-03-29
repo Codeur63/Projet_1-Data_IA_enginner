@@ -3,46 +3,87 @@ import pandas as pd
 
 
 class CSVLoader:
-    """
+    """Classe pour Charge un fichier CSV et le convertir en DataFrame pandas.
+
+    Args:
+        filepath (str | Path): Chemin vers le fichier CSV à charger.
+
+    Returns:
+        pd.DataFrame: Un DataFrame contenant les données du fichier CSV.
+
+    Raises:
+        FileNotFoundError: Si le fichier spécifié n'existe pas.
+        RuntimeError: Si une erreur survient lors de la lecture du fichier ou si le fichier
+
     Ici c'est la classe pour le chargement de fichier CSV,
     elle prend en entrée le chemin du fichier et retourne un DataFrame pandas.
     Dans un premier temps on verifier l'existance du fichier,
     puis on standardise les colonnes
     """
 
-    # Initialisation de la classe avec le chemin du fichier CSV
+    # Initialisation de la classe (constructeur) recoit un fichier ne text ou un objet Path et le convertit en objet Path
     def __init__(self, filepath: str | Path):
         self.filepath = Path(filepath)
 
     # Fonction de chargement de fichier CSV
     def load(self) -> pd.DataFrame:
 
-        #   Verification de l'existance dufichier
+        #   Verification de l'existance du fichier
         if not self.filepath.exists():
             raise FileNotFoundError(f"File are not found: {self.filepath}")
 
-        # Gerer les encodages differents
-        encodings = ("utf-8", "latin-1", "iso-8859-1")
+        # Verifier que le fichier a une extension CSV
+        allowed_exts = {".csv", ".txt"}
+        if self.filepath.suffix.lower() not in allowed_exts:
+            raise ValueError(f"Unsupported file extension: {self.filepath.suffix}")
+
+        # Gerer les encodages comment les accents
+        encodings = ("utf-8", "iso-8859-1")  # Liste des encodages courant
+        separators = [",", ";", "|"]  # Liste des séparateurs courants
         dataframe = None
 
         for encoding in encodings:
-            try:
-                dataframe = pd.read_csv(self.filepath, encoding=encoding)
-                break
-            except UnicodeDecodeError:
-                continue
-            except Exception as exc:
-                raise RuntimeError(
-                    f"Error occurred while reading {self.filepath}: {exc}"
-                ) from exc
+            for sep in separators:
+                try:
 
+                    # Lecture du fichier CSV avec l'encodage contenue dans encodings
+                    dataframe = pd.read_csv(
+                        self.filepath, encoding=encoding, sep=sep, on_bad_lines="error"
+                    )
+
+                    if len(dataframe.columns) < 2:
+                        raise ValueError("The columns is not enough to be a CSV file ")
+                    break
+
+                # CSV Mal formaté
+                except pd.errors.ParserError as e:
+                    raise RuntimeError(
+                        f"Error occurred while parsing {self.filepath}: {e}"
+                    ) from e
+
+                # Erreur d'encodage, on continue avec le prochain encodage
+                except UnicodeDecodeError:
+                    continue
+
+                # Erreur inattendue, on la remonte
+                except Exception as e:
+                    raise RuntimeError(
+                        f"Error occurred while reading {self.filepath}: {e}"
+                    ) from e
+
+        # Verifier si la dataframe à été chargée avec succès
         if dataframe is None:
             raise RuntimeError(
                 f"Unable to read the file {self.filepath} with encodings."
             )
 
-        dataframe.columns = [
-            column.strip().lower() for column in dataframe.columns
-        ]  # noqa: E501
+        # Vérifier si il ya seulement une colonne
+        if dataframe.shape[1] < 2:
+            raise ValueError(
+                "The file does not contain enough columns to be a valid CSV file."
+            )
+
+        # Standardisation des noms de colonnes et suppresion des espaces avec tout en minuscules
+        dataframe.columns = [column.strip().lower() for column in dataframe.columns]
 
         return dataframe

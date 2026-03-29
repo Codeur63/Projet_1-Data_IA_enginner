@@ -1,11 +1,11 @@
 [project]
 name = "projet-1-data-ia-enginner"
-version = "0.1.0"
+version = "0.1.2"
 description = "Nexacommerce clean data"
 authors = [
     {name = "Codeur63",email = "Codeur63@gmail.com"}
 ]
-license = {text = "Author"}
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -13,6 +13,10 @@ dependencies = [
     "numpy (>=2.4.3,<3.0.0)",
     "matplotlib (>=3.10.8,<4.0.0)"
 ]
+
+[project.urls]
+homepage = "https://python-poetry.org/"
+documentation = "https://python-poetry.org/docs/"
 
 [tool.poetry]
 packages = [{ include = "nexacommerce", from = "src" }]
