@@ -42,6 +42,12 @@ def inspect_dataset(df: pd.DataFrame) -> dict:
     if not isinstance(df, pd.DataFrame):
         raise ValueError("Input must be a pandas DataFrame.")
 
+    # Gestion du cas d'un dataFrame vide
+    if df.empty:
+        raise ValueError(
+            "The DataFrame is empty. Please provide a non-empty DataFrame for inspection."
+        )
+
     # Recuperer les dimensions du dataFrame
     row_count, col_count = df.shape
 

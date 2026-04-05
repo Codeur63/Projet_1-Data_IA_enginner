@@ -23,6 +23,7 @@ et que les cas limites sont gérés correctement.
 
 """
 
+import pytest
 import pandas as pd
 
 from nexacommerce.inspection import inspect_dataset
@@ -63,8 +64,11 @@ def test_inspect_dataset_empty_dataframe():
     df = pd.DataFrame()
     report = inspect_dataset(df)
 
-    assert report["n_rows"] == 0
-    assert report["n_cols"] == 0
+    with pytest.raises(
+        ValueError,
+        match="The DataFrame is empty. Please provide a non-empty DataFrame for inspection.",
+    ):
+        report
 
 
 # Test pour vérifier les données manquantes

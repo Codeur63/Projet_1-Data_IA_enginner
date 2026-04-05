@@ -13,8 +13,8 @@ différentes possibilité
 
 """
 
-import pandas as pd
 import pytest
+import pandas as pd
 from pathlib import Path
 
 from nexacommerce.data_loader import CSVLoader

@@ -10,7 +10,8 @@ Centralisation des Chemins
 
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parents[2]
+# BASE_DIR = Path(__file__).resolve().parents[2]
+BASE_DIR = Path("/home/unix/Documents/Apprentissage_Data_Python")
 DATA_DIR = BASE_DIR / "data"
 
 ORDERS_FILE = DATA_DIR / "orders.csv"
