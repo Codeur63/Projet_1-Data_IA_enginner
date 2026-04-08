@@ -26,7 +26,11 @@ class CSVLoader:
         self.filepath = Path(filepath)
 
     # Fonction de chargement de fichier CSV
-    def load(self) -> pd.DataFrame:
+    def load(
+        self,
+        low_memory=False,
+        encoding="utf-8",
+    ) -> pd.DataFrame:
 
         #   Verification de l'existance du fichier
         if not self.filepath.exists():
