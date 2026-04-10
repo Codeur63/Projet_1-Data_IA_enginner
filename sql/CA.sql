@@ -139,6 +139,7 @@ CREATE TABLE IF NOT EXISTS orders_clean (
 ENGINE = InnoDB
 COMMENT = 'Table des commandes nettoyées et normalisées';
 
+
 INSERT INTO orders_clean (
     order_id,
     customer_id,
@@ -242,6 +243,7 @@ SELECT
     delivery_time_min,
     CURRENT_TIMESTAMP AS cleaned_at
 FROM orders;
+
 
 WITH max_date AS (
 	SELECT MAX(order_date_clean) AS max_order_date FROM orders_clean

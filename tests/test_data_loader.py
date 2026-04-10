@@ -51,6 +51,38 @@ def test_load_file_order(tmp_path):
     assert df.shape == (12500, 12)
 
 
+# Test pour la non lecture des encodages
+def test_unable_to_read_with_encodings(monkeypatch, tmp_path):
+    file_path = tmp_path / "file.csv"
+    file_path.write_text("a,b\n1,2\n", encoding="utf-8")
+
+    # Simuler UnicodeDecodeError pour toutes les tentatives de pd.read_csv
+    def fake_read_csv(*args, **kwargs):
+        raise UnicodeDecodeError("utf-8", b"", 0, 1, "invalid start byte")
+
+    monkeypatch.setattr(pd, "read_csv", fake_read_csv)
+
+    loader = CSVLoader(file_path)
+
+    with pytest.raises(
+        RuntimeError, match=f"Unable to read the file {file_path} with encodings."
+    ):
+        loader.load()
+
+    # Simuler pd.errors.ParseError
+    def fake_read_csv_parser(*args, **kwargs):
+        raise pd.errors.ParserError("simulated parser error")
+
+    monkeypatch.setattr(pd, "read_csv", fake_read_csv_parser)
+
+    loader = CSVLoader(file_path)
+    with pytest.raises(
+        RuntimeError,
+        match=f"Error occurred while parsing {file_path}: simulated parser error",
+    ):
+        loader.load()
+
+
 # Test pour vérifier les données manquantes (Test de cas d'erreur)
 def test_load_file_empty_csv(tmp_path):
     # Création d'un fichier CSV vide

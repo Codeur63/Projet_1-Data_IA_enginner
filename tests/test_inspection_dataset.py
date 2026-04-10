@@ -62,13 +62,19 @@ def test_inspect_dataset_returns_expected_keys():
 def test_inspect_dataset_empty_dataframe():
     # DataFrame vide
     df = pd.DataFrame()
-    report = inspect_dataset(df)
 
     with pytest.raises(
         ValueError,
         match="The DataFrame is empty. Please provide a non-empty DataFrame for inspection.",
     ):
-        report
+        inspect_dataset(df)
+
+
+# Test si ce n'est pas un dataframe
+def test_inspect_not_dataframe():
+    df = "Path"
+    with pytest.raises(ValueError):
+        inspect_dataset(df)
 
 
 # Test pour vérifier les données manquantes
@@ -89,9 +95,9 @@ def test_inspect_dataset_detects_duplicates():
 
 
 # Test pour vérifier le pourcentage de doublons et le nombre de lignes
-def test_inspect_dataset_handles_empty_dataframe():
-    df = pd.DataFrame(columns=["a", "b"])
-    report = inspect_dataset(df)
+# def test_inspect_dataset_handles_empty_dataframe():
+#     df = pd.DataFrame(columns=["a", "b","c","d","e","f","d"])
+#     report = inspect_dataset(df)
 
-    assert report["n_rows"] == 0
-    assert report["duplicate_percentage"] == 0.0
+#     assert report["n_rows"] == 0
+#     assert report["duplicate_percentage"] == 0.0

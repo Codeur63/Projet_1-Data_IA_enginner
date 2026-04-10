@@ -6,7 +6,7 @@ order_id,customer_id,order_date,delivery_time_min,status,total_amount_xaf,city,q
 100004,CUST11846,29/12/2024 08:35,66.5,livré,15639.0,yaounde,Bastos,,30,8,Sunday
 100005,CUST17287,2024-02-14 19:41:00,287.3,en_retard,59249.0,DOUALA,Village,Vétements,43,19,Wednesday
 100006,CUST10909,2024/12/17 15:02,38.8,livré,5920.0,douala ,Kotto,Hygiène,27,15,Tuesday
-100007,CUST10387,2022-07-02 22:51:00,32.1,livré,25000,Douala,Akwa,Épicérie,7,22,Saturday
+100007,CUST10387,2022-07-02 22:51:00,32.1,livré,251000,Douala,Akwa,Épicérie,7,22,Saturday
 100008,CUST17144,28/12/2024 11:37,10.8,annulé,25000,bafoussam,Tamdja,Épicerie,14,11,Saturday
 100009,CUST10572,28/10/2024 15:54,145.9,en_retard,348663.0,DOUALA,Ngodi-Bakoko,Électronique,22,15,Monday
 100010,CUST11495,2024-09-30 11:24:00,30.6,livré,9990.0,Yaoundé ,Essos,boissons,4,11,Monday

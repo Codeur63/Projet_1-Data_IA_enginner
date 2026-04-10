@@ -75,17 +75,11 @@ class CSVLoader:
                         f"Error occurred while reading {self.filepath}: {e}"
                     ) from e
 
-        # Verifier si la dataframe à été chargée avec succès
-        if dataframe is None:
-            raise RuntimeError(
-                f"Unable to read the file {self.filepath} with encodings."
-            )
-
-        # Vérifier si il ya seulement une colonne
-        if dataframe.shape[1] < 2:
-            raise ValueError(
-                "The file does not contain enough columns to be a valid CSV file."
-            )
+            # Verifier si la dataframe à été chargée avec succès
+            if dataframe is None:
+                raise RuntimeError(
+                    f"Unable to read the file {self.filepath} with encodings."
+                )
 
         # Standardisation des noms de colonnes et suppresion des espaces avec tout en minuscules
         dataframe.columns = [column.strip().lower() for column in dataframe.columns]

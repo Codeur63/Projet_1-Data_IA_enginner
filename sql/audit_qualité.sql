@@ -11,8 +11,7 @@ LEFT JOIN customers c
     ON o.customer_id = c.customer_id
 WHERE c.customer_id IS NULL;
 
-------------------------------------------
--- Commande Orphelines sans client
+
 """
     De la table orders,
     faire une jointure à gauche (LEFT JOIN) avec la table customers
@@ -132,3 +131,47 @@ WHERE normalized_phone IS NOT NULL
 GROUP BY normalized_phone
 HAVING COUNT(*) > 1
 ORDER BY duplicate_count DESC, normalized_phone;
+
+-- Correlation entre le loyalty et le nombre de commande du client
+select c.* , o.status,oi.order_id,o.order_date
+from customers c
+inner JOIN orders o
+on c.customer_id = o.customer_id
+inner join order_items oi
+on o.order_id = oi.order_id
+where c.loyalty_score < 10;
+
+-- Comparer si le total_amount dans order_items vaut le meme pour orders
+select oi.order_id,
+sum(oi.line_total_xaf) as Total,
+o.total_amount_xaf as comparaison_total
+from order_items oi
+inner join orders o
+on o.order_id = oi.order_id
+group by oi.order_id
+;
+
+-- Afficher l'order_id pour le line_total_xaf et total_amount_xaf cohérent
+SELECT
+  oi.order_id,
+  SUM(oi.line_total_xaf) AS total,
+  o.total_amount_xaf AS comparaison_total
+FROM order_items oi
+JOIN orders o ON o.order_id = oi.order_id
+GROUP BY oi.order_id, o.total_amount_xaf
+HAVING SUM(oi.line_total_xaf) = o.total_amount_xaf;
+
+-- Etablir une corrélation entre les clients qui ont passé le plus grand nombre de commande et les montants (client actif, client inacif)
+select o.customer_id , count(o.order_id ), c.name, c.loyalty_score, sum(o.total_amount_xaf)
+from orders o
+inner join customers c
+on c.customer_id = o.customer_id
+where o.status not in ('annulé', 'en_cours')
+group by o.customer_id
+order by count(o.order_id) desc;
+
+
+-- Nombre de montant négatif
+select count(total_amount_xaf)
+from orders
+where total_amount_xaf<0;
