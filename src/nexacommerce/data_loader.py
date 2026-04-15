@@ -1,8 +1,3 @@
-"""
-La complexite de cette Classe serais de O(n), pour le
-chargement des données car il y a un parcous sur tout les fichiers
-"""
-
 from pathlib import Path
 import pandas as pd
 from typing import Generator
@@ -21,6 +16,10 @@ class CSVLoader:
         FileNotFoundError: Si le fichier spécifié n'existe pas.
         RuntimeError: Si une erreur survient lors de la lecture du fichier ou si le fichier
 
+    Méthodes:
+        - load() return un DataFrame et l'encodage utilisé
+        - iter_batches() return un génerateur par pas de batch sur le DataFrame
+
     Ici c'est la classe pour le chargement de fichier CSV,
     elle prend en entrée le chemin du fichier et retourne un DataFrame pandas.
     Dans un premier temps on verifier l'existance du fichier,
@@ -33,11 +32,7 @@ class CSVLoader:
         self.filepath = Path(filepath)
 
     # Fonction de chargement de fichier CSV
-    def load(
-        self,
-        low_memory=False,
-        encoding="utf-8",
-    ) -> pd.DataFrame:
+    def load(self, low_memory=False, enc: str = "utf-8") -> pd.DataFrame:
 
         #   Verification de l'existance du fichier
         if not self.filepath.exists():
@@ -48,45 +43,45 @@ class CSVLoader:
         if self.filepath.suffix.lower() not in allowed_exts:
             raise ValueError(f"Unsupported file extension: {self.filepath.suffix}")
 
-        # Gerer les encodages comment les accents
-        encodings = ("utf-8", "iso-8859-1")  # Liste des encodages courant
         separators = [",", ";", "|"]  # Liste des séparateurs courants
         dataframe = None
 
-        for encoding in encodings:
-            for sep in separators:
-                try:
+        for sep in separators:
+            try:
+                # Lecture du fichier CSV avec l'encodage contenue dans encodings
+                dataframe = pd.read_csv(
+                    self.filepath,
+                    encoding=enc,
+                    sep=sep,
+                    on_bad_lines="error",
+                    low_memory=low_memory,
+                )
 
-                    # Lecture du fichier CSV avec l'encodage contenue dans encodings
-                    dataframe = pd.read_csv(
-                        self.filepath, encoding=encoding, sep=sep, on_bad_lines="error"
-                    )
+                if len(dataframe.columns) < 2:
+                    raise ValueError("The columns is not enough to be a CSV file ")
+                break
 
-                    if len(dataframe.columns) < 2:
-                        raise ValueError("The columns is not enough to be a CSV file ")
-                    break
-
-                # CSV Mal formaté
-                except pd.errors.ParserError as e:
-                    raise RuntimeError(
-                        f"Error occurred while parsing {self.filepath}: {e}"
-                    ) from e
+            # CSV Mal formaté
+            except pd.errors.ParserError as e:
+                raise RuntimeError(
+                    f"Error occurred while parsing {self.filepath}: {e}"
+                ) from e
 
                 # Erreur d'encodage, on continue avec le prochain encodage
-                except UnicodeDecodeError:
-                    continue
+            except UnicodeDecodeError:
+                continue
 
                 # Erreur inattendue, on la remonte
-                except Exception as e:
-                    raise RuntimeError(
-                        f"Error occurred while reading {self.filepath}: {e}"
-                    ) from e
-
-            # Verifier si la dataframe à été chargée avec succès
-            if dataframe is None:
+            except Exception as e:
                 raise RuntimeError(
-                    f"Unable to read the file {self.filepath} with encodings."
-                )
+                    f"Error occurred while reading {self.filepath}: {e}"
+                ) from e
+
+        # Verifier si la dataframe à été chargée avec succès
+        if dataframe is None:
+            raise RuntimeError(
+                f"Unable to read the file {self.filepath} with encodings."
+            )
 
         # Standardisation des noms de colonnes et suppresion des espaces avec tout en minuscules
         dataframe.columns = [column.strip().lower() for column in dataframe.columns]
@@ -95,11 +90,11 @@ class CSVLoader:
 
     # Generateur par pas de 1000
     def iter_batches(
-        self, filepath: str | Path, pas: int = 1000
+        self, filepath: str | Path, pas: int = 1000, encoding="utf-8"
     ) -> Generator[pd.DataFrame, None, None]:
 
         # Charger le dataFrame avec la fonction plus haut
-        dataframe = self.load(filepath)
+        dataframe = self.load(encoding=encoding)
 
         # Faire une iteration par pas de 1000 sur longueur de la dataFrame - 1
         for i in range(0, len(dataframe), pas):

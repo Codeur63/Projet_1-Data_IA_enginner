@@ -190,7 +190,7 @@ SELECT
   o.total_amount_xaf - COALESCE(t.total_amount_order_item, 0) AS difference
 FROM orders o
 LEFT JOIN (
-  SELECT order_id, SUM(line_total_xaf * quantity) AS total_amount_order_item
+  SELECT order_id, SUM(line_total_xaf ) AS total_amount_order_item
   FROM order_items
   GROUP BY order_id
 ) t USING (order_id)
