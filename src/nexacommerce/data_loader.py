@@ -1,5 +1,11 @@
+"""
+La complexite de cette Classe serais de O(n), pour le
+chargement des données car il y a un parcous sur tout les fichiers
+"""
+
 from pathlib import Path
 import pandas as pd
+from typing import Generator
 
 
 class CSVLoader:
@@ -18,7 +24,8 @@ class CSVLoader:
     Ici c'est la classe pour le chargement de fichier CSV,
     elle prend en entrée le chemin du fichier et retourne un DataFrame pandas.
     Dans un premier temps on verifier l'existance du fichier,
-    puis on standardise les colonnes
+    puis on standardise les colonnes, et pour les fichiers assez grand
+    nous retournons un generateur qui vas la dataFrame par pas de 1000.
     """
 
     # Initialisation de la classe (constructeur) recoit un fichier ne text ou un objet Path et le convertit en objet Path
@@ -85,3 +92,16 @@ class CSVLoader:
         dataframe.columns = [column.strip().lower() for column in dataframe.columns]
 
         return dataframe
+
+    # Generateur par pas de 1000
+    def iter_batches(
+        self, filepath: str | Path, pas: int = 1000
+    ) -> Generator[pd.DataFrame, None, None]:
+
+        # Charger le dataFrame avec la fonction plus haut
+        dataframe = self.load(filepath)
+
+        # Faire une iteration par pas de 1000 sur longueur de la dataFrame - 1
+        for i in range(0, len(dataframe), pas):
+            # Recupere les valeurs dans un intervalle de 1000 les affiches et mémoirise
+            yield dataframe.iloc[i : i + pas]

@@ -1,4 +1,5 @@
-"""Analyse un DataFrame et retourne un rapport structuré.
+"""
+Analyse un DataFrame et retourne un rapport structuré.
 
     Args:
         df (pd.DataFrame): Le DataFrame à inspecter.
@@ -23,20 +24,17 @@
         - les valeurs manquantes,
         - les doublons.
 
-
-
-Complexité algorithmique de la détection des doublons :
-pandas.DataFrame.duplicated() repose en pratique sur des mécanismes
-de hachage pour identifier les répétitions. En moyenne, cela conduit
-à une complexité proche de O(n), avec n le nombre de lignes,
-ce qui est bien plus efficace qu'une comparaison paire à paire en O(n²).
+La complexité algorithimique de la détection des doublons de la fonction
+inlcue des Operations élémentaires qui sont le parcours de éléments de
+la DataFrame ainsi que la comparaison. Mais les methode .duplicated() s'appuie
+sur du hashing et alors dans le pire des quand nous pouvons avoir O(n)
 """
 
 import pandas as pd
 
 
 # Fonction qui prends un dataFrame et retourne un dictionnaire
-def inspect_dataset(df: pd.DataFrame) -> dict:
+def inspect_dataset(df: pd.DataFrame) -> pd.DataFrame:
 
     # Validation de l'entrée
     if not isinstance(df, pd.DataFrame):
@@ -52,7 +50,7 @@ def inspect_dataset(df: pd.DataFrame) -> dict:
     row_count, col_count = df.shape
 
     # Obtenir les types de données de chaque colonne
-    dtypes = dict(map(lambda column: (column, str(df[column].dtype)), df.columns))
+    dtypes = df.dtypes.astype(str).to_dict()
 
     # Compte les valeurs manquantes par colonne
     missing_counts = df.isna().sum().to_dict()
@@ -76,14 +74,27 @@ def inspect_dataset(df: pd.DataFrame) -> dict:
         filter(lambda column: missing_counts[column] > 0, df.columns)
     )
 
-    # Rapport structuré de l'inspection de la dataFrame
-    return {
-        "n_rows": row_count,
-        "n_cols": col_count,
+    # Resultat dans un dataFrame
+    result_dict = {
+        "rows": row_count,
+        "cols": col_count,
         "dtypes": dtypes,
         "missing_counts": missing_counts,
         "missing_percentages": missing_percentages,
         "columns_with_missing": columns_with_missing,
         "duplicate_count": duplicate_count,
         "duplicate_percentage": duplicate_percentage,
+        "unique": df.nunique().to_dict(),
+        "not_null": df.notnull().sum().to_dict(),
     }
+
+    resultat = (
+        pd.DataFrame.from_dict(result_dict, orient="index", columns=["Value"])
+        .reset_index()
+        .rename(columns={"index": "Mesure"})
+    )
+
+    return resultat
+
+
+# df.dtypes.astype(str).to_dict().

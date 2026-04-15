@@ -1,30 +1,6 @@
 -- Implémentez des fonctions de fenêtrage (RANK, LAG) pour identifier les livreurs dont le temps de
 -- livraison moyen s'est dégradé sur les 3 derniers mois.
 
-
--- WITH delivery_courier AS (
--- SELECT
---     c.courier_id,
---     c.name as courier_name,
---     o.order_id,
---     o.order_date,
---     o.status,
---     TIMESTAMPDIFF(MINUTE, STR_TO_DATE(o.order_date, '%d/%m/%Y'), CURDATE()) as delivery_time_minutes
---     FROM orders o
---     INNER JOIN couriers c ON o.courier_id = c.courier_id
---     WHERE o.status = 'livré'
--- ),
--- select
---     courier_id,
---     courier_name,
---     order_date,
---     delivery_time_minutes,
---     RANK() OVER (PARTITION BY courier_id ORDER BY order_date DESC) as delivery_rank,
---     LAG(delivery_time_minutes) OVER (PARTITION BY courier_id ORDER BY order_date DESC) as previous_delivery_time
---     from delivery_courier
-
-
-
 WITH cleaned_orders AS (
     SELECT
         oc.order_id,
@@ -100,18 +76,11 @@ SELECT
 	cr.name 	AS livreur,
 	cr.city,
 	COUNT(o.order_id)	AS nb_livraisons,
-	RANK() OVER (	PARTITION BY cr.city
-	-- un classement par ville
-	ORDER BY COUNT(o.order_id) DESC
-	-- du plus actif au moins actif
-	) 	AS rang_dans_ville,
-	DENSE_RANK() OVER (
-	ORDER BY COUNT(o.order_id) DESC
-	-- classement global
-	)	AS rang_global
+	RANK() OVER (	PARTITION BY cr.city ORDER BY COUNT(o.order_id) DESC) AS rang_dans_ville,
+	DENSE_RANK() OVER (	ORDER BY COUNT(o.order_id) DESC	)	AS rang_global
 FROM couriers AS cr
 INNER JOIN orders AS o ON cr.courier_id = o.courier_id
-WHERE o.status = 'livré'
+WHERE o.status not in ("en_cours", 'annulé')
 AND cr.is_active = 1
 GROUP BY cr.courier_id, cr.name, cr.city
 ORDER BY cr.city, rang_dans_ville;

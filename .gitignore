@@ -15,3 +15,4 @@ test/__pycache__/
 .coverage.*
 htmlcov/
 .env.example
+.pytest_cache

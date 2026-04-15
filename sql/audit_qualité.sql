@@ -1,4 +1,4 @@
--- Commande Orphelines sans client
+-- Afficher les commandes sans clients
 SELECT
     o.order_id as Id_Order,
     o.customer_id as Id_Customer,
@@ -33,7 +33,7 @@ SELECT
         ELSE 'Nul'
     END as Anomalie
 FROM orders o
-WHERE o.total_amount_xaf <= 0;
+WHERE o.total_amount_xaf <= 0;    ~588
 
 """
     De la table orders,
@@ -42,25 +42,8 @@ WHERE o.total_amount_xaf <= 0;
     le montant, l'état de la commande et la date de commande
     ainsi que le type d'anomalie (négatif ou nul)
 """
-
-
-
--- Les doublons dans la table customers avec nom du client et ID client
-SELECT
-    c.customer_id as Id_Customer,
-    c.name as nom_client,
-    COUNT(*) as Nombre_doublons
-FROM customers c
-GROUP BY c.customer_id, c.name
-HAVING COUNT(*) > 1;
-
-"""
-   De la table customers,
-   regroupe les customers par leur ID et nom,
-   ensuite filtre les groupes qui sont présent plus d'une fois
-   et affiche nous l'id du client, son nom et le nombre de fois qu'il est
-   présent dans la table
-"""
+-- Nombre de delivery_time_min à null
+select count(*) from orders where delivery_time_min=''; ~1893
 
 
 -- les doublons dans la table customers avec numéro de téléphone
@@ -70,7 +53,7 @@ SELECT
     count(*) as Nombre_de_fois
 FROM customers c
 GROUP BY c.name, c.phone
-HAVING count(*) > 1;
+HAVING count(*) > 1; resultat : ~55
 
 """
     De la table customers,
@@ -79,6 +62,15 @@ HAVING count(*) > 1;
     et affiche nous le nom du client, son numéro de téléphone et le nombre de fois qu'il est
     présent dans la table
 """
+
+
+-- Doublons dans la table customers avec les loyalty score
+
+SELECT c.name, GROUP_CONCAT(DISTINCT c.loyalty_score ORDER BY c.loyalty_score) AS scores
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.name
+HAVING COUNT(DISTINCT c.loyalty_score) > 1; Resultat : 142
 
 -- Affichier les clients qui ont le meme numero de telephone
 SELECT c1.customer_id, c1.name,  c1.phone
@@ -100,8 +92,7 @@ ORDER BY c1.phone, c1.name;
     ensuite trie les résultats par numéro de téléphone et nom du client
 """
 
--- 1C-3. Doublons métier sur téléphone normalisé
--- Objectif : rapprocher 6XXXXXXXX, +2376XXXXXXXX, 237-6XXXXXXXX, etc.
+--  Doublons métier sur téléphone normalisé
 WITH normalized_customers AS (
     SELECT
         customer_id,
@@ -132,6 +123,19 @@ GROUP BY normalized_phone
 HAVING COUNT(*) > 1
 ORDER BY duplicate_count DESC, normalized_phone;
 
+
+-- Identifier les doublons client par loyalty_Score.
+SELECT c.name, GROUP_CONCAT(distinct c.loyalty_score ORDER BY c.loyalty_score SEPARATOR ' | ') AS scores
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.name
+HAVING COUNT(DISTINCT c.loyalty_score) > 1;
+
+
+-- Client avec des loyaly score inférieur ou égal à 0
+select count(*) from customers where loyalty_score<=0 ;
+
+
 -- Correlation entre le loyalty et le nombre de commande du client
 select c.* , o.status,oi.order_id,o.order_date
 from customers c
@@ -139,7 +143,8 @@ inner JOIN orders o
 on c.customer_id = o.customer_id
 inner join order_items oi
 on o.order_id = oi.order_id
-where c.loyalty_score < 10;
+where c.loyalty_score < 10 ;
+
 
 -- Comparer si le total_amount dans order_items vaut le meme pour orders
 select oi.order_id,
@@ -148,8 +153,8 @@ o.total_amount_xaf as comparaison_total
 from order_items oi
 inner join orders o
 on o.order_id = oi.order_id
-group by oi.order_id
-;
+group by oi.order_id ;
+
 
 -- Afficher l'order_id pour le line_total_xaf et total_amount_xaf cohérent
 SELECT
@@ -160,6 +165,7 @@ FROM order_items oi
 JOIN orders o ON o.order_id = oi.order_id
 GROUP BY oi.order_id, o.total_amount_xaf
 HAVING SUM(oi.line_total_xaf) = o.total_amount_xaf;
+
 
 -- Etablir une corrélation entre les clients qui ont passé le plus grand nombre de commande et les montants (client actif, client inacif)
 select o.customer_id , count(o.order_id ), c.name, c.loyalty_score, sum(o.total_amount_xaf)
@@ -175,3 +181,18 @@ order by count(o.order_id) desc;
 select count(total_amount_xaf)
 from orders
 where total_amount_xaf<0;
+
+-- Différence de montant avec la table orders et order_items
+SELECT
+  o.order_id,
+  o.total_amount_xaf,
+  COALESCE(t.total_amount_order_item, 0) AS total_amount_order_item,
+  o.total_amount_xaf - COALESCE(t.total_amount_order_item, 0) AS difference
+FROM orders o
+LEFT JOIN (
+  SELECT order_id, SUM(line_total_xaf * quantity) AS total_amount_order_item
+  FROM order_items
+  GROUP BY order_id
+) t USING (order_id)
+WHERE COALESCE(o.total_amount_xaf, 0) <> COALESCE(t.total_amount_order_item, 0)
+ORDER BY ABS(o.total_amount_xaf - COALESCE(t.total_amount_order_item, 0)) DESC;

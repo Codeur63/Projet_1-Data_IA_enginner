@@ -5,14 +5,16 @@
 ## Table Order
 
 ### Constat 1
-La table orders retrouver 17 variantes de status, 14 variantes de ville, en retrouve les temps de livraison à 0, des montants négatfis, des dates avec différents formats.
+La table orders retrouver 17 variantes de status, 14 variantes de ville, en retrouve les temps de livraison à 0, des montants négatfis, des dates avec différents formats et delivery_time_min qui sont null.
 
 #### Solution
 - Pour la table orders il faudrais s'assurer à normaliser les status par :
 `delivered, late, cancelled, in_progress`, les pour les villes faudrais les normalisés LOWER(TRIM(VILLE)) pour le sql, et en python nous allons `city.strip().lower()`.
--  Les montants négatifs nous allons mettre tout les montants négatif en valeur absolue
+- Les montants négatifs nous allons mettre tout les montants négatif en valeur absolue
 - Les dates nous allons devoir idenitifier toutes les formats et parsed les dates.
 - mettre un temps moyen de livraison dans les delivery time inférieur à 0.
+- Calculer les outliers
+
 
 ### Constat 2
 La table orders à une violation 2NF, notament sur la colonne product_category.
@@ -63,7 +65,7 @@ Nous constatons dans cette table les numero de telephone n'ont pas le bon format
 - Nous remarquons tout aussi que les prix des produits sont éléves par rapport au base_line_xaf de la table products
 
 #### Reflexion
-- Nous pouvons nous dire qu'il y a eu des promotions pour des produit, mais nous remarquons aussi que des fois le prix est élévé et ne sons pas les memes.
+- Nous pouvons nous dire qu'il y a eu des promotions pour des produit, mais nous remarquons aussi que des fois le prix est élévé et ne sont pas les memes.
 - Nous pouvons mettre ça sur le prix de livraison mais le soucis c'est qu'il n'est pas uniforme que faire ?
 
 ### Table customers

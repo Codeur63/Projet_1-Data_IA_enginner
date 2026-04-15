@@ -6,7 +6,12 @@
 """
 
 """
-    De la table order recuperer les id, montant, ville, status et les dates normalisées
+    De la table order recuperer les id, montant, ville, status, les dates normalisées ainsi que les montants
+    qu'on mettras dans un table temporaire, puis de cette table temporaire, nous allons
+    extraire les villes, les dates en mois, compters les montants, les status livŕe,en_retard,annulé
+    et les moyennes, ce qui nous permert de creer notre vue v_order_kpi2.
+
+    puis nous affichons le tout.
 """
 
 
@@ -24,15 +29,10 @@ SELECT
     city,
     DATE_FORMAT(order_date_clean, '%Y-%m') AS order_month,
     COUNT(*) AS total_commande,
-    -- nombre de commandes livrées à temps
-    SUM(CASE WHEN statut = 'livré' THEN 1 ELSE 0 END) AS total_livré,
-    -- nombre de commandes en retard
-    SUM(CASE WHEN statut = 'en_retard' THEN 1 ELSE 0 END) AS total_retard,
-    -- nombre de commandes annulées
-    SUM(CASE WHEN statut = 'annulé' THEN 1 ELSE 0 END) AS total_annulé,
-    -- montant total des commandes  au cours du mois
-    SUM(total_amount_xaf) as total_amount_month,
-    -- taux de livraison à temps = livré / (livré + en_retard)
+    count(statut = 'livré') AS total_livré,
+    count(statut = 'en_retard') AS total_retard,
+    count(statut = 'annulé') AS total_annulé,
+    sum(total_amount_xaf) as total_amount_month,
     ROUND(
         SUM(CASE WHEN statut = 'livré' THEN 1 ELSE 0 END)
         / NULLIF(
@@ -41,7 +41,7 @@ SELECT
         ),
         4
     ) AS pct_livré,
-    -- panier moyen sur les commandes réalisées
+
     ROUND(
         AVG(
             CASE
@@ -52,9 +52,9 @@ SELECT
         ),
         2
     ) AS panier_moyen_comande,
-    -- taux d'annulation = annulé / total
+
     ROUND(
-        SUM(CASE WHEN statut = 'annulé' THEN 1 ELSE 0 END)
+        count(statut = 'annulé')
         / NULLIF(COUNT(*), 0),
         4
     ) AS pct_annulé
