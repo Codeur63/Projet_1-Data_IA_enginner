@@ -75,7 +75,7 @@ def inspect_dataset(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Resultat dans un dataFrame
-    result_dict = {
+    resultat = {
         "rows": row_count,
         "cols": col_count,
         "dtypes": dtypes,
@@ -87,12 +87,6 @@ def inspect_dataset(df: pd.DataFrame) -> pd.DataFrame:
         "unique": df.nunique().to_dict(),
         "not_null": df.notnull().sum().to_dict(),
     }
-
-    resultat = (
-        pd.DataFrame.from_dict(result_dict, orient="index", columns=["Value"])
-        .reset_index()
-        .rename(columns={"index": "Mesure"})
-    )
 
     return resultat
 

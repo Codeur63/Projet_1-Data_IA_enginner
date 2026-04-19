@@ -1,6 +1,6 @@
 [project]
 name = "projet-1-data-ia-enginner"
-version = "0.2.3"
+version = "0.2.4"
 description = "Nexacommerce clean data"
 authors = [
     {name = "Codeur63",email = "Codeur63@gmail.com"}

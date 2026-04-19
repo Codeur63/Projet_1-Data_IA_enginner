@@ -17,7 +17,7 @@ import pytest
 import pandas as pd
 from pathlib import Path
 
-from nexacommerce.data_loader import CSVLoader
+from nexacommerce.data_loader import DataLoader
 
 
 # Validation sur fichier CSV (Test comportement normal)
@@ -25,7 +25,7 @@ def test_load_valid_csv(tmp_path):
     file_path = tmp_path / "sample.csv"
     file_path.write_text("Colonne A,Colonne B\n1,2\n3,4", encoding="utf-8")
 
-    loader = CSVLoader(file_path)
+    loader = DataLoader(file_path)
     df = loader.load()
 
     assert isinstance(df, pd.DataFrame)
@@ -42,7 +42,7 @@ def test_load_file_order(tmp_path):
     file_path = project_root / "data" / "orders.csv"
 
     # Chargement du fichier CSV
-    loader = CSVLoader(file_path)
+    loader = DataLoader(file_path)
     df = loader.load()
 
     # Vérification que la dataFrame est chargée
@@ -62,7 +62,7 @@ def test_unable_to_read_with_encodings(monkeypatch, tmp_path):
 
     monkeypatch.setattr(pd, "read_csv", fake_read_csv)
 
-    loader = CSVLoader(file_path)
+    loader = DataLoader(file_path)
 
     with pytest.raises(
         RuntimeError, match=f"Unable to read the file {file_path} with encodings."
@@ -75,7 +75,7 @@ def test_unable_to_read_with_encodings(monkeypatch, tmp_path):
 
     monkeypatch.setattr(pd, "read_csv", fake_read_csv_parser)
 
-    loader = CSVLoader(file_path)
+    loader = DataLoader(file_path)
     with pytest.raises(
         RuntimeError,
         match=f"Error occurred while parsing {file_path}: simulated parser error",
@@ -89,7 +89,7 @@ def test_load_file_empty_csv(tmp_path):
     file_path = tmp_path / "empty.csv"
     file_path.write_text("", encoding="utf-8")
 
-    loader = CSVLoader(file_path)
+    loader = DataLoader(file_path)
 
     with pytest.raises(RuntimeError):
         loader.load()
@@ -104,7 +104,7 @@ def test_load_file_none_csv(tmp_path):
 
     file_path.write_text(file_content)
 
-    loader = CSVLoader(file_path)
+    loader = DataLoader(file_path)
 
     with pytest.raises((pd.errors.ParserError, RuntimeError, ValueError)):
         loader.load()
@@ -116,7 +116,7 @@ def test_load_file_extension(tmp_path):
     file_path = tmp_path / "data.json"
     file_path.write_text('{"key": "value"}', encoding="utf-8")
 
-    loader = CSVLoader(file_path)
+    loader = DataLoader(file_path)
 
     with pytest.raises(ValueError):
         loader.load()
@@ -136,7 +136,7 @@ def test_load_file_structured_text_csv(tmp_path):
     file_path.write_text(file_content, encoding="utf-8")
 
     # Chargement du fichier txt
-    loader = CSVLoader(file_path)
+    loader = DataLoader(file_path)
     df = loader.load()
 
     # Verification des attentes du fichier Text structuré
@@ -150,7 +150,7 @@ def test_load_file_structured_text_csv(tmp_path):
 
 # Validation sur fichier CSV manquant (Test de cas d'erreur)
 def test_load_missing_file_raises_error():
-    loader = CSVLoader("file.csv")
+    loader = DataLoader("file.csv")
 
     # Vérification que le chargement d'un fichier manquant lève une erreur FileNotFoundError
     with pytest.raises(FileNotFoundError):
@@ -168,7 +168,7 @@ def test_columns_are_normalized(tmp_path):
     )
 
     # Chargement du fichier CSV
-    loader = CSVLoader(file_path)
+    loader = DataLoader(file_path)
     df = loader.load()
 
     # Vérification des colonnes

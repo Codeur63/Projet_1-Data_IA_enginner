@@ -3,7 +3,7 @@ import pandas as pd
 from typing import Generator
 
 
-class CSVLoader:
+class DataLoader:
     """Classe pour Charge un fichier CSV et le convertir en DataFrame pandas.
 
     Args:
@@ -32,7 +32,7 @@ class CSVLoader:
         self.filepath = Path(filepath)
 
     # Fonction de chargement de fichier CSV
-    def load(self, low_memory=False, enc: str = "utf-8") -> pd.DataFrame:
+    def load(self, low_memory: bool = False, enc: str = "utf-8") -> pd.DataFrame:
 
         #   Verification de l'existance du fichier
         if not self.filepath.exists():
@@ -44,8 +44,6 @@ class CSVLoader:
             raise ValueError(f"Unsupported file extension: {self.filepath.suffix}")
 
         separators = [",", ";", "|"]  # Liste des séparateurs courants
-        dataframe = None
-
         for sep in separators:
             try:
                 # Lecture du fichier CSV avec l'encodage contenue dans encodings
@@ -69,7 +67,7 @@ class CSVLoader:
 
                 # Erreur d'encodage, on continue avec le prochain encodage
             except UnicodeDecodeError:
-                continue
+                break
 
                 # Erreur inattendue, on la remonte
             except Exception as e:
@@ -90,13 +88,23 @@ class CSVLoader:
 
     # Generateur par pas de 1000
     def iter_batches(
-        self, filepath: str | Path, pas: int = 1000, encoding="utf-8"
+        self, filepath: str | Path, pas: int = 1000, enc: str = "utf-8"
     ) -> Generator[pd.DataFrame, None, None]:
 
         # Charger le dataFrame avec la fonction plus haut
-        dataframe = self.load(encoding=encoding)
+        dataframe = self.load(encoding=enc)
 
         # Faire une iteration par pas de 1000 sur longueur de la dataFrame - 1
         for i in range(0, len(dataframe), pas):
             # Recupere les valeurs dans un intervalle de 1000 les affiches et mémoirise
             yield dataframe.iloc[i : i + pas]
+
+    def separator_search(self, enc: str = "utf-8") -> str:
+
+        separators = [",", ";", "|"]  # Liste des séparateurs courants
+        sample = self.filepath.read_text(encoding=enc)
+
+        for sep in separators:
+            first_line = sample.split("\n")[0]
+            if first_line.count(sep) >= 1:
+                return sep
