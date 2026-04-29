@@ -1,0 +1,11 @@
+.venv,
+pycache,
+__pycache__/
+.git,
+data,
+*.html
+.env
+../reports/*
+.pytest_cache
+.env.example
+.flake8

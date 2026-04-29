@@ -76,8 +76,8 @@ def inspect_dataset(df: pd.DataFrame) -> pd.DataFrame:
 
     # Resultat dans un dataFrame
     resultat = {
-        "rows": row_count,
-        "cols": col_count,
+        "n_rows": row_count,
+        "n_cols": col_count,
         "dtypes": dtypes,
         "missing_counts": missing_counts,
         "missing_percentages": missing_percentages,
@@ -89,6 +89,3 @@ def inspect_dataset(df: pd.DataFrame) -> pd.DataFrame:
     }
 
     return resultat
-
-
-# df.dtypes.astype(str).to_dict().

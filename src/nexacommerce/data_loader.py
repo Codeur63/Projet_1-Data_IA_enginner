@@ -32,7 +32,7 @@ class DataLoader:
         self.filepath = Path(filepath)
 
     # Fonction de chargement de fichier CSV
-    def load(self, low_memory: bool = False, enc: str = "utf-8") -> pd.DataFrame:
+    def load(self, low_memory: bool = False) -> pd.DataFrame:
 
         #   Verification de l'existance du fichier
         if not self.filepath.exists():
@@ -43,13 +43,15 @@ class DataLoader:
         if self.filepath.suffix.lower() not in allowed_exts:
             raise ValueError(f"Unsupported file extension: {self.filepath.suffix}")
 
+        dataframe = None
+
         separators = [",", ";", "|"]  # Liste des séparateurs courants
         for sep in separators:
             try:
                 # Lecture du fichier CSV avec l'encodage contenue dans encodings
                 dataframe = pd.read_csv(
                     self.filepath,
-                    encoding=enc,
+                    encoding="utf-8",
                     sep=sep,
                     on_bad_lines="error",
                     low_memory=low_memory,
@@ -67,7 +69,7 @@ class DataLoader:
 
                 # Erreur d'encodage, on continue avec le prochain encodage
             except UnicodeDecodeError:
-                break
+                continue
 
                 # Erreur inattendue, on la remonte
             except Exception as e:
@@ -108,3 +110,10 @@ class DataLoader:
             first_line = sample.split("\n")[0]
             if first_line.count(sep) >= 1:
                 return sep
+
+    def iter_ligne(filepath: str | Path):
+        # Ouvrir le fichier avec l'encodage utf-8
+        with open(filepath, "r", encoding="utf-8") as file:
+            # Lire le fichier ligne par ligne et retourner chaque ligne sans les espaces
+            for line in file:
+                yield line.strip().split(",")
