@@ -33,7 +33,7 @@ SELECT
         ELSE 'Nul'
     END as Anomalie
 FROM orders o
-WHERE o.total_amount_xaf <= 0;    ~588
+WHERE o.total_amount_xaf <= 0;
 
 """
     De la table orders,
@@ -41,26 +41,6 @@ WHERE o.total_amount_xaf <= 0;    ~588
     ensuite affiche nous la catégorie du produit,
     le montant, l'état de la commande et la date de commande
     ainsi que le type d'anomalie (négatif ou nul)
-"""
--- Nombre de delivery_time_min à null
-select count(*) from orders where delivery_time_min=''; ~1893
-
-
--- les doublons dans la table customers avec numéro de téléphone
-SELECT
-    c.name as nom_client,
-    c.phone as numero_telephone,
-    count(*) as Nombre_de_fois
-FROM customers c
-GROUP BY c.name, c.phone
-HAVING count(*) > 1; resultat : ~55
-
-"""
-    De la table customers,
-    regroupe les customers par leur nom et numéro de téléphone,
-    ensuite filtre les groupes qui sont présent plus d'une fois
-    et affiche nous le nom du client, son numéro de téléphone et le nombre de fois qu'il est
-    présent dans la table
 """
 
 
@@ -124,14 +104,6 @@ HAVING COUNT(*) > 1
 ORDER BY duplicate_count DESC, normalized_phone;
 
 
--- Identifier les doublons client par loyalty_Score.
-SELECT c.name, GROUP_CONCAT(distinct c.loyalty_score ORDER BY c.loyalty_score SEPARATOR ' | ') AS scores
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-GROUP BY c.name
-HAVING COUNT(DISTINCT c.loyalty_score) > 1;
-
-
 -- Client avec des loyaly score inférieur ou égal à 0
 select count(*) from customers where loyalty_score<=0 ;
 
@@ -176,11 +148,6 @@ where o.status not in ('annulé', 'en_cours')
 group by o.customer_id
 order by count(o.order_id) desc;
 
-
--- Nombre de montant négatif
-select count(total_amount_xaf)
-from orders
-where total_amount_xaf<0;
 
 -- Différence de montant avec la table orders et order_items
 SELECT

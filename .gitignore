@@ -16,3 +16,4 @@ test/__pycache__/
 htmlcov/
 .env.example
 .pytest_cache
+.ipynb_checkpoints/
