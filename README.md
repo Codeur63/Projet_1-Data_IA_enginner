@@ -5,15 +5,13 @@ This project is an exercise designed to put you in the shoes of a Data and AI En
 ## 📋 Table des Matières
 
 - [Contexte](#-contexte)
-- [Structure du Projet](#-structure-du-projet)
-- [Prérequis](#-prérequis)
-- [Installation & Reproductibilité](#-installation--reproductibilité)
-- [Données](#-données)
-- [Utilisation](#-utilisation)
+- [Three of Projet](#-three-of-projet)
+- [Require](#-require)
+- [Installation ](#-installation)
+- [Data](#-data)
+- [Using](#-using)
 - [Tests](#-tests)
-- [Livrables](#-livrables)
 - [Résultats Clés](#-résultats-clés)
-- [Roadmap](#-roadmap)
 ---
 
 ## 🎯 Contexte
@@ -87,7 +85,7 @@ nexacommerce-data/
 
 ---
 
-## ⚙️ Prérequis
+## ⚙️ Require
 
 | Outil | Version minimale | Vérification |
 |---|---|---|
@@ -191,7 +189,7 @@ poetry run pytest tests/ -v --cov=src --cov-report=term-missing
 
 ---
 
-## 💻 Use
+## 💻 Using
 
 ### Python Pipeline
 
@@ -242,7 +240,7 @@ poetry run pytest --cov=src --cov-report=html
 open htmlcov/index.html
 ```
 
-### Tests inclus
+### Tests use
 
 | Fichier | Tests | Ce qui est couvert |
 |---|---|---|
