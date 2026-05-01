@@ -131,7 +131,7 @@ cp .env.example .env
 nano .env
 ```
 
-Contenu de `.env` :
+Contenu of `.env` :
 ```env
 DB_HOST=localhost
 DB_PORT=3306
@@ -164,10 +164,10 @@ poetry run pytest tests/ -v --cov=src --cov-report=term-missing
 
 | Fichier | Lignes | Colonnes | Description |
 |---|---|---|---|
-| `orders.csv` | 12 500 | 12 | Commandes 2022–2025 avec impuretés documentées |
-| `customers.csv` | 2 380 | 7 | Clients avec ~280 doublons identifiés |
-| `order_items.csv` | ~31 000 | 8 | Détail produits par commande |
-| `couriers.csv` | 47 | 8 | Livreurs partenaires |
+| `orders.csv` | 12 500 | 12 | orders 2022–2025 with durty data docs |
+| `customers.csv` | 2 380 | 7 | customers avec ~230 double |
+| `order_items.csv` | ~31 000 | 8 | product with orders  |
+| `couriers.csv` | 47 | 8 | couriers partenaires |
 
 ---
 
